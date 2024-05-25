@@ -223,9 +223,26 @@ const gameDisplay = (function () {
         for (let row = 0; row < gameBoard.NUM_ROWS_ON_BOARD; row++) {
             for (let col = 0; col < gameBoard.NUM_COLUMNS_ON_BOARD; col++) {
                 let divGameBoardTile = document.createElement("div");
+                divGameBoardTile.classList.add("game-tile");
+                applyLocationBasedClasses(divGameBoardTile, row, col);
                 divGameBoardTile.textContent = gameBoard.getMarkAtLocation(row, col);
                 divGameBoardDisplay.appendChild(divGameBoardTile);
             }
+        }
+    }
+
+    const applyLocationBasedClasses = (divGameBoardTile, row, col) => {
+        if (row === 0) {
+            divGameBoardTile.classList.add("top");
+        }
+        if (row === gameBoard.NUM_ROWS_ON_BOARD - 1) {
+            divGameBoardTile.classList.add("bottom");
+        }
+        if (col === 0) {
+            divGameBoardTile.classList.add("left");
+        }
+        if (col === gameBoard.NUM_COLUMNS_ON_BOARD - 1) {
+            divGameBoardTile.classList.add("right");
         }
     }
 
@@ -249,6 +266,14 @@ const gameDisplay = (function () {
 let gameBoard = createGameBoard();
 gameBoard.initializeGameBoard();
 gameBoard.addMark(0, 0, "x");
+gameBoard.addMark(0, 1, "x");
+gameBoard.addMark(0, 2, "x");
+gameBoard.addMark(1, 0, "x");
+gameBoard.addMark(1, 1, "x");
+gameBoard.addMark(1, 2, "x");
+gameBoard.addMark(2, 0, "x");
+gameBoard.addMark(2, 1, "x");
+gameBoard.addMark(2, 2, "x");
 gameDisplay.displayGameBoard(gameBoard);
 // gameDisplay.displayPlayerWins();
 
