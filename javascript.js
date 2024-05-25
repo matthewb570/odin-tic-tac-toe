@@ -168,7 +168,11 @@ function createGameBoard() {
         return markCounter >= NUM_ROWS_ON_BOARD * NUM_COLUMNS_ON_BOARD;
     }
 
-    return { addMark, initializeGameBoard, checkForWinner, TIE_INDICATOR, printGameBoard };
+    const getMarkAtLocation = (row, col) => {
+        return gameBoard[row][col];
+    }
+
+    return { addMark, initializeGameBoard, checkForWinner, TIE_INDICATOR, printGameBoard, NUM_ROWS_ON_BOARD, NUM_COLUMNS_ON_BOARD, getMarkAtLocation };
 }
 
 function createGame() {
@@ -211,5 +215,42 @@ function createGame() {
     return { runGame };
 }
 
-let game = createGame();
-game.runGame();
+const gameDisplay = (function () {
+    const divGameBoardDisplay = document.querySelector(".game .game-board");
+    const divPlayerWinsDisplay = document.querySelector(".game .player-wins");
+
+    const displayGameBoard = (gameBoard) => {
+        for (let row = 0; row < gameBoard.NUM_ROWS_ON_BOARD; row++) {
+            for (let col = 0; col < gameBoard.NUM_COLUMNS_ON_BOARD; col++) {
+                let divGameBoardTile = document.createElement("div");
+                divGameBoardTile.textContent = gameBoard.getMarkAtLocation(row, col);
+                divGameBoardDisplay.appendChild(divGameBoardTile);
+            }
+        }
+    }
+
+    const displayPlayerWins = (player1, player2) => {
+        let divPlayer1Info = document.createElement("div");
+        divPlayer1Info = createPlayerWinsString(player1);
+        divPlayerWinsDisplay.appendChild(divPlayer1Info);
+
+        let divPlayer2Info = document.createElement("div");
+        divPlayer2Info = createPlayerWinsString(player2);
+        divPlayerWinsDisplay.appendChild(divPlayer2Info);
+    }
+
+    const createPlayerWinsString = (player) => {
+        return `${player.playerName}: ${player.getNumWins()}`;
+    }
+
+    return { displayGameBoard, displayPlayerWins };
+})();
+
+let gameBoard = createGameBoard();
+gameBoard.initializeGameBoard();
+gameBoard.addMark(0, 0, "x");
+gameDisplay.displayGameBoard(gameBoard);
+// gameDisplay.displayPlayerWins();
+
+// let game = createGame();
+// game.runGame();
