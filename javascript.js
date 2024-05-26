@@ -1,5 +1,3 @@
-// TODO: Prevent players from selecting an already occupied tile (game logic already prevents overwriting these tiles, but selecting an occupied tile currently still counts as a turn)
-// TODO: Display winner instead of a generic game over message
 // TODO: Add score-keeping
 // TODO: Add ability to start a new game
 // TODO: Optional: Highlight the winning combination when there's a winner
@@ -241,11 +239,15 @@ function createGame() {
         return gameBoard.checkForWinner() || gameBoard.isGameBoardFull();
     }
 
+    const isCatsGame = () => {
+        return !gameBoard.checkForWinner() && gameBoard.isGameBoardFull();
+    }
+
     const getCurrentPlayer = () => {
         return players[currentPlayerIndex];
     }
 
-    return { takeTurn, getNumGameBoardRows, getNumGameBoardColumns, getGameBoardMarkAtLocation, isGameOver, getCurrentPlayer };
+    return { takeTurn, getNumGameBoardRows, getNumGameBoardColumns, getGameBoardMarkAtLocation, isGameOver, getCurrentPlayer, isCatsGame };
 }
 
 const gameDisplay = (function () {
@@ -253,11 +255,23 @@ const gameDisplay = (function () {
     const ROW_ATTRIBUTE_NAME = "row";
     const COLUMN_ATTRIBUTE_NAME = "col";
 
-    const divGameWinner = document.querySelector(".game .game-winner");
+    const divGameStatus = document.querySelector(".game .game-status");
     const divGameBoardDisplay = document.querySelector(".game .game-board");
     const divPlayerWinsDisplay = document.querySelector(".game .player-wins");
 
     const game = createGame();
+
+    const displayGameStatus = () => {
+        if (!game.isGameOver()) {
+            divGameStatus.textContent = `${game.getCurrentPlayer().playerName}'s turn`;
+        } else {
+            if (game.isCatsGame()) {
+                divGameStatus.textContent = "It's a tie!";
+            } else {
+                divGameStatus.textContent = `${game.getCurrentPlayer().playerName} wins!`;
+            }
+        }
+    }
 
     const displayGameBoard = () => {
         while (divGameBoardDisplay.firstChild) {
@@ -314,14 +328,12 @@ const gameDisplay = (function () {
     const handleGameTileClick = (event) => {
         if (!game.isGameOver()) {
             game.takeTurn(event.target.getAttribute(ROW_ATTRIBUTE_NAME), event.target.getAttribute(COLUMN_ATTRIBUTE_NAME));
+            displayGameStatus();
             displayGameBoard();
-            if (game.isGameOver()) {
-                divGameWinner.textContent = "Game Over!";
-            }
         }
     }
 
-    return { displayGameBoard, displayPlayerWins };
+    return { displayGameBoard, displayPlayerWins, displayGameStatus };
 })();
 
 // let gameBoard = createGameBoard();
@@ -336,6 +348,7 @@ const gameDisplay = (function () {
 // gameBoard.addMark(2, 1, "x");
 // gameBoard.addMark(2, 2, "x");
 gameDisplay.displayGameBoard();
+gameDisplay.displayGameStatus();
 // gameDisplay.displayPlayerWins();
 
 // let game = createGame();
