@@ -53,34 +53,25 @@ function createGameBoard() {
     }
 
     const checkForWinner = () => {
-        let winner = checkForHorizontalWinner();
-        if (winner !== "") {
-            return winner;
+        let isWinnerPresent = checkForHorizontalWinner();
+        if (isWinnerPresent) {
+            return isWinnerPresent;
         }
 
-        winner = checkForVerticalWinner();
-        if (winner !== "") {
-            return winner;
+        isWinnerPresent = checkForVerticalWinner();
+        if (isWinnerPresent) {
+            return isWinnerPresent;
         }
 
-        winner = checkForDiagonalWinner();
-        if (winner !== "") {
-            return winner;
-        }
-
-        if (isGameBoardFull()) {
-            return TIE_INDICATOR;
-        }
-
-        return "";
+        return checkForDiagonalWinner();
     }
 
     const checkForHorizontalWinner = () => {
-        let winner = "";
+        let isWinnerPresent = false;
 
         let row = 0;
 
-        while (winner === "" && row < NUM_ROWS_ON_BOARD) {
+        while (!isWinnerPresent && row < NUM_ROWS_ON_BOARD) {
             let initialIcon = gameBoard[row][0];
 
             if (initialIcon !== null) {
@@ -88,7 +79,7 @@ function createGameBoard() {
                     if (gameBoard[row][col] !== initialIcon) {
                         break;
                     } else if (col === NUM_COLUMNS_ON_BOARD - 1) {
-                        winner = initialIcon;
+                        isWinnerPresent = true;
                     }
                 }
             }
@@ -96,15 +87,15 @@ function createGameBoard() {
             row++;
         }
 
-        return winner;
+        return isWinnerPresent;
     }
 
     const checkForVerticalWinner = () => {
-        let winner = "";
+        let isWinnerPresent = false;
 
         let col = 0 ;
 
-        while (winner === "" && col < NUM_COLUMNS_ON_BOARD) {
+        while (!isWinnerPresent && col < NUM_COLUMNS_ON_BOARD) {
             let initialIcon = gameBoard[0][col];
 
             if (initialIcon !== null) {
@@ -112,7 +103,7 @@ function createGameBoard() {
                     if (gameBoard[row][col] !== initialIcon) {
                         break;
                     } else if (row === NUM_ROWS_ON_BOARD - 1) {
-                        winner = initialIcon;
+                        isWinnerPresent = true;
                     }
                 }
             }
@@ -120,20 +111,20 @@ function createGameBoard() {
             col++;
         }
 
-        return winner;
+        return isWinnerPresent;
     }
 
     const checkForDiagonalWinner = () => {
-        let winner = checkForTopDownDiagonalWinner();
-        if (winner !== "") {
-            return winner;
+        let isWinnerPresent = checkForTopDownDiagonalWinner();
+        if (isWinnerPresent) {
+            return isWinnerPresent;
         }
 
         return checkForBottomUpDiagonalWinner();
     }
 
     const checkForTopDownDiagonalWinner = () => {
-        let winner = "";
+        let isWinnerPresent = false;
 
         let initialIcon = gameBoard[0][0];
         if (initialIcon !== null) {
@@ -141,16 +132,16 @@ function createGameBoard() {
                 if (gameBoard[row][row] !== initialIcon) {
                     break;
                 } else if (row === NUM_ROWS_ON_BOARD - 1) {
-                    winner = initialIcon;
+                    isWinnerPresent = true;
                 }
             }
         }
 
-        return winner;
+        return isWinnerPresent;
     }
 
     const checkForBottomUpDiagonalWinner = () => {
-        let winner = "";
+        let isWinnerPresent = false;
 
         let row = NUM_ROWS_ON_BOARD - 1;
         let col = 0;
@@ -159,7 +150,7 @@ function createGameBoard() {
         if (initialIcon !== null) {
             do {
                 if (row === 0) {
-                    winner = initialIcon;
+                    isWinnerPresent = true;
                 }
                 row--;
                 col++;
@@ -167,7 +158,7 @@ function createGameBoard() {
                 gameBoard[row][col] === initialIcon)
         }
 
-        return winner;
+        return isWinnerPresent;
     }
 
     const isGameBoardFull = () => {
@@ -186,7 +177,7 @@ function createGameBoard() {
         return NUM_COLUMNS_ON_BOARD;
     }
 
-    return { addMark, initializeGameBoard, checkForWinner, TIE_INDICATOR, printGameBoard, getMarkAtLocation, getNumGameBoardRows, getNumGameBoardColumns };
+    return { addMark, initializeGameBoard, checkForWinner, TIE_INDICATOR, printGameBoard, getMarkAtLocation, getNumGameBoardRows, getNumGameBoardColumns, isGameBoardFull };
 }
 
 function createGame() {
@@ -198,9 +189,6 @@ function createGame() {
 
     let gameBoard = createGameBoard();
     gameBoard.initializeGameBoard();
-
-    let gameOver = false;
-    let winner = "";
 
     // TODO: Remove this if not needed
     // const runGame = () => {
@@ -227,16 +215,9 @@ function createGame() {
 
     const takeTurn = (row, column) => {
         gameBoard.addMark(row, column, players[currentPlayerIndex].playerIcon);
-        currentPlayerIndex = ++currentPlayerIndex % players.length;
-    }
-
-    const checkEndOfGame = () => {
-        winner = gameBoard.checkForWinner();
-        if (winner !== "") {
-            gameOver = true;
-            return true;
+        if (!isGameOver()) {
+            currentPlayerIndex = ++currentPlayerIndex % players.length;
         }
-        return false;
     }
 
     const getNumGameBoardRows = () => {
@@ -252,10 +233,14 @@ function createGame() {
     }
 
     const isGameOver = () => {
-        return gameOver;
+        return gameBoard.checkForWinner() || gameBoard.isGameBoardFull();
     }
 
-    return { takeTurn, getNumGameBoardRows, getNumGameBoardColumns, getGameBoardMarkAtLocation, checkEndOfGame, isGameOver };
+    const getCurrentPlayer = () => {
+        return players[currentPlayerIndex];
+    }
+
+    return { takeTurn, getNumGameBoardRows, getNumGameBoardColumns, getGameBoardMarkAtLocation, isGameOver, getCurrentPlayer };
 }
 
 const gameDisplay = (function () {
@@ -325,7 +310,7 @@ const gameDisplay = (function () {
         if (!game.isGameOver()) {
             game.takeTurn(event.target.getAttribute(ROW_ATTRIBUTE_NAME), event.target.getAttribute(COLUMN_ATTRIBUTE_NAME));
             displayGameBoard();
-            if (game.checkEndOfGame()) {
+            if (game.isGameOver()) {
                 divGameWinner.textContent = "Game Over!";
             }
         }
