@@ -1,4 +1,3 @@
-// TODO: Add score-keeping
 // TODO: Add ability to start a new game
 // TODO: Optional: Highlight the winning combination when there's a winner
 
@@ -217,9 +216,15 @@ function createGame() {
     // }
 
     const takeTurn = (row, column) => {
-        let markPlaced = gameBoard.addMark(row, column, players[currentPlayerIndex].playerIcon);
-        if (!isGameOver() && markPlaced) {
-            currentPlayerIndex = ++currentPlayerIndex % players.length;
+        if (!isGameOver()) {
+            let markPlaced = gameBoard.addMark(row, column, players[currentPlayerIndex].playerIcon);
+            if (!isGameOver()) {
+                if (markPlaced) {
+                    currentPlayerIndex = ++currentPlayerIndex % players.length;
+                }
+            } else if (!isCatsGame()) {
+                players[currentPlayerIndex].incrementNumWins();
+            }
         }
     }
 
@@ -247,7 +252,11 @@ function createGame() {
         return players[currentPlayerIndex];
     }
 
-    return { takeTurn, getNumGameBoardRows, getNumGameBoardColumns, getGameBoardMarkAtLocation, isGameOver, getCurrentPlayer, isCatsGame };
+    const getPlayers = () => {
+        return players;
+    }
+
+    return { takeTurn, getNumGameBoardRows, getNumGameBoardColumns, getGameBoardMarkAtLocation, isGameOver, getCurrentPlayer, isCatsGame, getPlayers};
 }
 
 const gameDisplay = (function () {
@@ -311,14 +320,16 @@ const gameDisplay = (function () {
         }
     }
 
-    const displayPlayerWins = (player1, player2) => {
-        let divPlayer1Info = document.createElement("div");
-        divPlayer1Info = createPlayerWinsString(player1);
-        divPlayerWinsDisplay.appendChild(divPlayer1Info);
+    const displayPlayerWins = (players) => {
+        while(divPlayerWinsDisplay.firstChild) {
+            divPlayerWinsDisplay.removeChild(divPlayerWinsDisplay.lastChild);
+        }
 
-        let divPlayer2Info = document.createElement("div");
-        divPlayer2Info = createPlayerWinsString(player2);
-        divPlayerWinsDisplay.appendChild(divPlayer2Info);
+        for (const player of players) {
+            let divPlayerInfo = document.createElement("div");
+            divPlayerInfo.textContent = createPlayerWinsString(player);
+            divPlayerWinsDisplay.appendChild(divPlayerInfo);
+        }
     }
 
     const createPlayerWinsString = (player) => {
@@ -330,6 +341,7 @@ const gameDisplay = (function () {
             game.takeTurn(event.target.getAttribute(ROW_ATTRIBUTE_NAME), event.target.getAttribute(COLUMN_ATTRIBUTE_NAME));
             displayGameStatus();
             displayGameBoard();
+            displayPlayerWins(game.getPlayers());
         }
     }
 
