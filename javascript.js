@@ -1,3 +1,9 @@
+// TODO: Prevent players from selecting an already occupied tile (game logic already prevents overwriting these tiles, but selecting an occupied tile currently still counts as a turn)
+// TODO: Display winner instead of a generic game over message
+// TODO: Add score-keeping
+// TODO: Add ability to start a new game
+// TODO: Optional: Highlight the winning combination when there's a winner
+
 function createPlayer(playerName, playerIcon) {
     let numWins = 0;
 
@@ -172,7 +178,15 @@ function createGameBoard() {
         return gameBoard[row][col];
     }
 
-    return { addMark, initializeGameBoard, checkForWinner, TIE_INDICATOR, printGameBoard, NUM_ROWS_ON_BOARD, NUM_COLUMNS_ON_BOARD, getMarkAtLocation };
+    const getNumGameBoardRows = () => {
+        return NUM_ROWS_ON_BOARD;
+    }
+
+    const getNumGameBoardColumns = () => {
+        return NUM_COLUMNS_ON_BOARD;
+    }
+
+    return { addMark, initializeGameBoard, checkForWinner, TIE_INDICATOR, printGameBoard, getMarkAtLocation, getNumGameBoardRows, getNumGameBoardColumns };
 }
 
 function createGame() {
@@ -185,47 +199,94 @@ function createGame() {
     let gameBoard = createGameBoard();
     gameBoard.initializeGameBoard();
 
-    const runGame = () => {
+    let gameOver = false;
+    let winner = "";
 
-        let winner = "";
+    // TODO: Remove this if not needed
+    // const runGame = () => {
 
-        while (winner === "") {
-            gameBoard.printGameBoard();
-            console.log(`It's ${players[currentPlayerIndex].playerName}'s turn`);
+    //     let winner = "";
+
+    //     while (winner === "") {
+    //         gameBoard.printGameBoard();
+    //         console.log(`It's ${players[currentPlayerIndex].playerName}'s turn`);
             
-            let row = prompt("Please enter a row:");
-            let column = prompt("Please enter a column");
-            takeTurn(row, column);
+    //         let row = prompt("Please enter a row:");
+    //         let column = prompt("Please enter a column");
+    //         takeTurn(row, column);
 
-            winner = gameBoard.checkForWinner();
-        }
+    //         winner = gameBoard.checkForWinner();
+    //     }
 
-        if (winner === gameBoard.TIE_INDICATOR) {
-            console.log("It's a tie!");
-        } else {
-            console.log(`${winner}s win!`);
-        }
-    }
+    //     if (winner === gameBoard.TIE_INDICATOR) {
+    //         console.log("It's a tie!");
+    //     } else {
+    //         console.log(`${winner}s win!`);
+    //     }
+    // }
 
     const takeTurn = (row, column) => {
         gameBoard.addMark(row, column, players[currentPlayerIndex].playerIcon);
         currentPlayerIndex = ++currentPlayerIndex % players.length;
     }
 
-    return { runGame };
+    const checkEndOfGame = () => {
+        winner = gameBoard.checkForWinner();
+        if (winner !== "") {
+            gameOver = true;
+            return true;
+        }
+        return false;
+    }
+
+    const getNumGameBoardRows = () => {
+        return gameBoard.getNumGameBoardRows();
+    }
+
+    const getNumGameBoardColumns = () => {
+        return gameBoard.getNumGameBoardColumns();
+    }
+
+    const getGameBoardMarkAtLocation = (row, col) => {
+        return gameBoard.getMarkAtLocation(row, col);
+    }
+
+    const isGameOver = () => {
+        return gameOver;
+    }
+
+    return { takeTurn, getNumGameBoardRows, getNumGameBoardColumns, getGameBoardMarkAtLocation, checkEndOfGame, isGameOver };
 }
 
 const gameDisplay = (function () {
+
+    const ROW_ATTRIBUTE_NAME = "row";
+    const COLUMN_ATTRIBUTE_NAME = "col";
+
+    const divGameWinner = document.querySelector(".game .game-winner");
     const divGameBoardDisplay = document.querySelector(".game .game-board");
     const divPlayerWinsDisplay = document.querySelector(".game .player-wins");
 
-    const displayGameBoard = (gameBoard) => {
-        for (let row = 0; row < gameBoard.NUM_ROWS_ON_BOARD; row++) {
-            for (let col = 0; col < gameBoard.NUM_COLUMNS_ON_BOARD; col++) {
+    const game = createGame();
+
+    const displayGameBoard = () => {
+        while (divGameBoardDisplay.firstChild) {
+            divGameBoardDisplay.removeChild(divGameBoardDisplay.lastChild);
+        }
+
+        for (let row = 0; row < game.getNumGameBoardRows(); row++) {
+            for (let col = 0; col < game.getNumGameBoardColumns(); col++) {
                 let divGameBoardTile = document.createElement("div");
                 divGameBoardTile.classList.add("game-tile");
                 applyLocationBasedClasses(divGameBoardTile, row, col);
-                divGameBoardTile.textContent = gameBoard.getMarkAtLocation(row, col);
+                
+                divGameBoardTile.setAttribute(ROW_ATTRIBUTE_NAME, row);
+                divGameBoardTile.setAttribute(COLUMN_ATTRIBUTE_NAME, col);
+                
+                divGameBoardTile.textContent = game.getGameBoardMarkAtLocation(row, col);
+                
+                divGameBoardTile.addEventListener("click", handleGameTileClick);
+                
                 divGameBoardDisplay.appendChild(divGameBoardTile);
             }
         }
@@ -235,13 +296,13 @@ const gameDisplay = (function () {
         if (row === 0) {
             divGameBoardTile.classList.add("top");
         }
-        if (row === gameBoard.NUM_ROWS_ON_BOARD - 1) {
+        if (row === game.getNumGameBoardRows() - 1) {
             divGameBoardTile.classList.add("bottom");
         }
         if (col === 0) {
             divGameBoardTile.classList.add("left");
         }
-        if (col === gameBoard.NUM_COLUMNS_ON_BOARD - 1) {
+        if (col === game.getNumGameBoardColumns() - 1) {
             divGameBoardTile.classList.add("right");
         }
     }
@@ -260,21 +321,31 @@ const gameDisplay = (function () {
         return `${player.playerName}: ${player.getNumWins()}`;
     }
 
+    const handleGameTileClick = (event) => {
+        if (!game.isGameOver()) {
+            game.takeTurn(event.target.getAttribute(ROW_ATTRIBUTE_NAME), event.target.getAttribute(COLUMN_ATTRIBUTE_NAME));
+            displayGameBoard();
+            if (game.checkEndOfGame()) {
+                divGameWinner.textContent = "Game Over!";
+            }
+        }
+    }
+
     return { displayGameBoard, displayPlayerWins };
 })();
 
-let gameBoard = createGameBoard();
-gameBoard.initializeGameBoard();
-gameBoard.addMark(0, 0, "x");
-gameBoard.addMark(0, 1, "x");
-gameBoard.addMark(0, 2, "x");
-gameBoard.addMark(1, 0, "x");
-gameBoard.addMark(1, 1, "x");
-gameBoard.addMark(1, 2, "x");
-gameBoard.addMark(2, 0, "x");
-gameBoard.addMark(2, 1, "x");
-gameBoard.addMark(2, 2, "x");
-gameDisplay.displayGameBoard(gameBoard);
+// let gameBoard = createGameBoard();
+// gameBoard.initializeGameBoard();
+// gameBoard.addMark(0, 0, "x");
+// gameBoard.addMark(0, 1, "x");
+// gameBoard.addMark(0, 2, "x");
+// gameBoard.addMark(1, 0, "x");
+// gameBoard.addMark(1, 1, "x");
+// gameBoard.addMark(1, 2, "x");
+// gameBoard.addMark(2, 0, "x");
+// gameBoard.addMark(2, 1, "x");
+// gameBoard.addMark(2, 2, "x");
+gameDisplay.displayGameBoard();
 // gameDisplay.displayPlayerWins();
 
 // let game = createGame();
