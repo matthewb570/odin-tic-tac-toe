@@ -23,13 +23,18 @@ function createGameBoard() {
     let markCounter;
 
     const addMark = (squareRow, squareColumn, playerIcon) => {    
+        let markPlaced = false;
+        
         if (squareRow >= 0 && squareRow < NUM_ROWS_ON_BOARD &&
             squareColumn >= 0 && squareColumn < NUM_COLUMNS_ON_BOARD) {
             if (gameBoard[squareRow][squareColumn] === null) {
                 gameBoard[squareRow][squareColumn] = playerIcon;
                 markCounter++;
+                markPlaced = true;
             }
         }
+
+        return markPlaced;
     }
 
     const initializeGameBoard = () => {
@@ -214,8 +219,8 @@ function createGame() {
     // }
 
     const takeTurn = (row, column) => {
-        gameBoard.addMark(row, column, players[currentPlayerIndex].playerIcon);
-        if (!isGameOver()) {
+        let markPlaced = gameBoard.addMark(row, column, players[currentPlayerIndex].playerIcon);
+        if (!isGameOver() && markPlaced) {
             currentPlayerIndex = ++currentPlayerIndex % players.length;
         }
     }
