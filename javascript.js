@@ -1,4 +1,3 @@
-// TODO: Add ability to start a new game
 // TODO: Optional: Highlight the winning combination when there's a winner
 
 function createPlayer(playerName, playerIcon) {
@@ -256,7 +255,12 @@ function createGame() {
         return players;
     }
 
-    return { takeTurn, getNumGameBoardRows, getNumGameBoardColumns, getGameBoardMarkAtLocation, isGameOver, getCurrentPlayer, isCatsGame, getPlayers};
+    const startNewGame = () => {
+        currentPlayerIndex = 0;
+        gameBoard.initializeGameBoard();
+    }
+
+    return { takeTurn, getNumGameBoardRows, getNumGameBoardColumns, getGameBoardMarkAtLocation, isGameOver, getCurrentPlayer, isCatsGame, getPlayers, startNewGame};
 }
 
 const gameDisplay = (function () {
@@ -267,6 +271,7 @@ const gameDisplay = (function () {
     const divGameStatus = document.querySelector(".game .game-status");
     const divGameBoardDisplay = document.querySelector(".game .game-board");
     const divPlayerWinsDisplay = document.querySelector(".game .player-wins");
+    const btnNewGame = document.querySelector(".game button.new-game");
 
     const game = createGame();
 
@@ -339,13 +344,24 @@ const gameDisplay = (function () {
     const handleGameTileClick = (event) => {
         if (!game.isGameOver()) {
             game.takeTurn(event.target.getAttribute(ROW_ATTRIBUTE_NAME), event.target.getAttribute(COLUMN_ATTRIBUTE_NAME));
-            displayGameStatus();
-            displayGameBoard();
-            displayPlayerWins(game.getPlayers());
+            displayGame();
         }
     }
 
-    return { displayGameBoard, displayPlayerWins, displayGameStatus };
+    const handleNewGameButtonClick = (event) => {
+        game.startNewGame();
+        displayGame();
+    }
+
+    const displayGame = () => {
+        displayGameStatus();
+        displayGameBoard();
+        displayPlayerWins(game.getPlayers());
+    }
+
+    btnNewGame.addEventListener("click", handleNewGameButtonClick);
+
+    return { displayGame };
 })();
 
 // let gameBoard = createGameBoard();
@@ -359,9 +375,11 @@ const gameDisplay = (function () {
 // gameBoard.addMark(2, 0, "x");
 // gameBoard.addMark(2, 1, "x");
 // gameBoard.addMark(2, 2, "x");
-gameDisplay.displayGameBoard();
-gameDisplay.displayGameStatus();
+// gameDisplay.displayGameBoard();
+// gameDisplay.displayGameStatus();
 // gameDisplay.displayPlayerWins();
 
 // let game = createGame();
 // game.runGame();
+
+gameDisplay.displayGame();
