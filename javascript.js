@@ -1,4 +1,5 @@
 // TODO: Optional: Highlight the winning combination when there's a winner
+// TODO: Allow player name entry
 
 function createPlayer(playerName, playerIcon) {
     let numWins = 0;
@@ -251,8 +252,12 @@ function createGame() {
         return players[currentPlayerIndex];
     }
 
-    const getPlayers = () => {
-        return players;
+    const getPlayer1 = () => {
+        return players[0];
+    }
+
+    const getPlayer2 = () => {
+        return players[1];
     }
 
     const startNewGame = () => {
@@ -260,7 +265,7 @@ function createGame() {
         gameBoard.initializeGameBoard();
     }
 
-    return { takeTurn, getNumGameBoardRows, getNumGameBoardColumns, getGameBoardMarkAtLocation, isGameOver, getCurrentPlayer, isCatsGame, getPlayers, startNewGame};
+    return { takeTurn, getNumGameBoardRows, getNumGameBoardColumns, getGameBoardMarkAtLocation, isGameOver, getCurrentPlayer, isCatsGame, getPlayer1, getPlayer2, startNewGame};
 }
 
 const gameDisplay = (function () {
@@ -268,9 +273,10 @@ const gameDisplay = (function () {
     const ROW_ATTRIBUTE_NAME = "row";
     const COLUMN_ATTRIBUTE_NAME = "col";
 
-    const divGameStatus = document.querySelector(".game .game-status");
+    const divPlayer1Score = document.querySelector(".game-status-bar .player-wins:first-child");
+    const divPlayer2Score = document.querySelector(".game-status-bar .player-wins:last-child");
+    const divGameStatus = document.querySelector(".game-status-bar .game-status");
     const divGameBoardDisplay = document.querySelector(".game .game-board");
-    const divPlayerWinsDisplay = document.querySelector(".game .player-wins");
     const btnNewGame = document.querySelector(".game button.new-game");
 
     const game = createGame();
@@ -325,20 +331,24 @@ const gameDisplay = (function () {
         }
     }
 
-    const displayPlayerWins = (players) => {
-        while(divPlayerWinsDisplay.firstChild) {
-            divPlayerWinsDisplay.removeChild(divPlayerWinsDisplay.lastChild);
-        }
-
-        for (const player of players) {
-            let divPlayerInfo = document.createElement("div");
-            divPlayerInfo.textContent = createPlayerWinsString(player);
-            divPlayerWinsDisplay.appendChild(divPlayerInfo);
-        }
+    const displayPlayerWins = (player1, player2) => {
+        writePlayerWinsToDiv(player1, divPlayer1Score);
+        writePlayerWinsToDiv(player2, divPlayer2Score);
     }
 
-    const createPlayerWinsString = (player) => {
-        return `${player.playerName}: ${player.getNumWins()}`;
+    const writePlayerWinsToDiv = (player, div) => {
+        while (div.firstChild) {
+            div.removeChild(div.lastChild);
+        }
+        
+        let divPlayerName = document.createElement("div");
+        divPlayerName.textContent = player.playerName;
+
+        let divPlayerScore = document.createElement("div");
+        divPlayerScore.textContent = player.getNumWins();
+
+        div.appendChild(divPlayerName);
+        div.appendChild(divPlayerScore);
     }
 
     const handleGameTileClick = (event) => {
@@ -356,7 +366,7 @@ const gameDisplay = (function () {
     const displayGame = () => {
         displayGameStatus();
         displayGameBoard();
-        displayPlayerWins(game.getPlayers());
+        displayPlayerWins(game.getPlayer1(), game.getPlayer2());
     }
 
     btnNewGame.addEventListener("click", handleNewGameButtonClick);
