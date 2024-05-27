@@ -1,5 +1,6 @@
 :root {
     --font-color-dark: rgb(38, 40, 46);
+    --standard-box-shadow: rgb(156, 156, 156) 1px 1px 5px;
     
     --icon-cross: url("icons/close.svg");
     --icon-circle: url("icons/circle-outline.svg");
@@ -120,4 +121,47 @@ button {
 
 button:hover {
     background-color: lightblue;
+}
+
+dialog.new-game-dialog {
+    border-width: 1px;
+    box-shadow: var(--standard-box-shadow);
+    border-radius: 10px;
+    width: clamp(350px, 50%, 450px);
+}
+
+dialog.new-game-dialog::backdrop {
+    backdrop-filter: blur(5px);
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+form .description-label {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+input[type="text"] {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 5px;
+    border-radius: 5px;
+    border-style: solid;
+    border-width: 1px;
+    font-size: 1rem;
+}
+
+input[type="text"]:focus {
+    border-color: skyblue;
+    outline: none;
+    box-shadow: var(--standard-box-shadow);
+}
+
+form button.start {
+    margin-top: 20px;
 }

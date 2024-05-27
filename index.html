@@ -16,7 +16,20 @@
                 <div class="player-wins"></div>
             </div>
             <div class="game-board"></div>
-            <button type="button" class="new-game">Start New Game</button>
+            <button type="button" class="new-game" hidden>Start New Game</button>
         </div>
+        <dialog class="new-game-dialog">
+            <form action="dialog">
+                <label for="txt-player1-name" class="description-label">
+                    <span>Player 1 Name:</span>
+                    <input type="text" name="txtPlayer1Name" id="txt-player1-name" placeholder="Player 1" maxlength="20">
+                </label>
+                <label for="txt-player2-name" class="description-label">
+                    <span>Player 2 Name:</span>
+                    <input type="text" name="txtPlayer2Name" id="txt-player2-name" placeholder="Player 2" maxlength="20">
+                </label>
+                <button type="button" class="start">Start</button>
+            </form>
+        </dialog>
     </body>
 </html>

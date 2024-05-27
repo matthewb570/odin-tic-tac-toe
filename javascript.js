@@ -1,5 +1,3 @@
-// TODO: Allow player name entry
-
 function createPlayer(playerName, playerIcon) {
     let numWins = 0;
 
@@ -179,7 +177,7 @@ function createGameBoard() {
     return { addMark, resetGameBoard, checkForWinner, getMarkAtLocation, getNumGameBoardRows, getNumGameBoardColumns, isGameBoardFull };
 }
 
-const game = (function (player1Name, player2Name) {
+function createGame(player1Name, player2Name) {
     let players = [
         createPlayer(player1Name, "X"),
         createPlayer(player2Name, "O")
@@ -243,9 +241,9 @@ const game = (function (player1Name, player2Name) {
     }
 
     return { takeTurn, getNumGameBoardRows, getNumGameBoardColumns, getGameBoardMarkAtLocation, isGameOver, getCurrentPlayer, isCatsGame, getPlayer1, getPlayer2, startNewGame, getWinningPath};
-})("Player 1", "Player 2");
+}
 
-const gameDisplay = (function (gameToDisplay) {
+function createGameDisplay(gameToDisplay) {
 
     const ROW_ATTRIBUTE_NAME = "row";
     const COLUMN_ATTRIBUTE_NAME = "col";
@@ -363,6 +361,10 @@ const gameDisplay = (function (gameToDisplay) {
     }
 
     const displayGame = () => {
+        if (btnNewGame.style.display = "hidden") {
+            btnNewGame.style.display = "block";
+        }
+
         displayGameStatus();
         displayGameBoard();
         displayPlayerWins(game.getPlayer1(), game.getPlayer2());
@@ -376,6 +378,26 @@ const gameDisplay = (function (gameToDisplay) {
     btnNewGame.addEventListener("click", handleNewGameButtonClick);
 
     return { displayGame };
-})(game);
+}
 
-gameDisplay.displayGame();
+const newGameDialog = (function () {
+    const dialog = document.querySelector("dialog.new-game-dialog");
+    const dialogStartButton = document.querySelector("dialog.new-game-dialog button.start");
+    const txtPlayer1Name = document.querySelector("dialog.new-game-dialog #txt-player1-name");
+    const txtPlayer2Name = document.querySelector("dialog.new-game-dialog #txt-player2-name");
+
+    const start = () => {
+        dialog.showModal();
+    }
+
+    const handleNewGameDialogSubmission = () => {
+        createGameDisplay(createGame(txtPlayer1Name.value !== "" ? txtPlayer1Name.value : "Player 1", txtPlayer2Name.value !== "" ? txtPlayer2Name.value : "Player 2")).displayGame();
+        dialog.close();
+    }
+
+    dialogStartButton.addEventListener("click", handleNewGameDialogSubmission);
+
+    return { start };
+})();
+
+newGameDialog.start();
