@@ -302,17 +302,32 @@ const gameDisplay = (function () {
             for (let col = 0; col < game.getNumGameBoardColumns(); col++) {
                 let divGameBoardTile = document.createElement("div");
                 divGameBoardTile.classList.add("game-tile");
+
                 applyLocationBasedClasses(divGameBoardTile, row, col);
-                
+                applyIcon(divGameBoardTile, game.getGameBoardMarkAtLocation(row, col));
+
                 divGameBoardTile.setAttribute(ROW_ATTRIBUTE_NAME, row);
                 divGameBoardTile.setAttribute(COLUMN_ATTRIBUTE_NAME, col);
-                
-                divGameBoardTile.textContent = game.getGameBoardMarkAtLocation(row, col);
-                
+                                
                 divGameBoardTile.addEventListener("click", handleGameTileClick);
                 
                 divGameBoardDisplay.appendChild(divGameBoardTile);
             }
+        }
+    }
+
+    const applyIcon = (divGameBoardTile, gameBoardMark) => {
+        if (gameBoardMark !== null) {
+            let divGameBoardIcon = document.createElement("div");
+            divGameBoardIcon.classList.add("icon");
+
+            if (gameBoardMark === game.getPlayer1().playerIcon) {
+                divGameBoardIcon.classList.add("cross");
+            } else if (gameBoardMark === game.getPlayer2().playerIcon) {
+                divGameBoardIcon.classList.add("circle");
+            }
+
+            divGameBoardTile.appendChild(divGameBoardIcon);
         }
     }
 

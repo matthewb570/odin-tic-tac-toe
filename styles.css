@@ -1,6 +1,9 @@
 :root {
     --font-color-dark: rgb(38, 40, 46);
     
+    --icon-cross: url("icons/close.svg");
+    --icon-circle: url("icons/circle-outline.svg");
+    
     font-family: "Roboto", sans-serif;
 }
 
@@ -50,6 +53,22 @@ body {
     height: 100%;
     width: 100%;
     border-color: skyblue;
+}
+
+.game-tile .icon {
+    mask-repeat: no-repeat;
+    mask-position: center;
+    background-color: var(--font-color-dark);
+    height: 100%;
+    width: 100%;
+}
+
+.icon.cross {
+    mask-image: var(--icon-cross);
+}
+
+.icon.circle {
+    mask-image: var(--icon-circle);
 }
 
 .game-tile.top {
