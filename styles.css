@@ -30,7 +30,9 @@ body {
 
 .game .game-status {
     font-size: 2rem;
-    color: var(--font-color-dark)
+    color: var(--font-color-dark);
+    width: 350px;
+    text-align: center;
 }
 
 .game .game-board {
