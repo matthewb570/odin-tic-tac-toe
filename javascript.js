@@ -13,8 +13,6 @@ function createGameBoard() {
     const NUM_ROWS_ON_BOARD = 3;
     const NUM_COLUMNS_ON_BOARD = 3;
 
-    const TIE_INDICATOR = "tie";
-
     let gameBoard;
     let markCounter;
 
@@ -33,7 +31,7 @@ function createGameBoard() {
         return markPlaced;
     }
 
-    const initializeGameBoard = () => {
+    const resetGameBoard = () => {
         gameBoard = Array(NUM_ROWS_ON_BOARD);
         
         for (let row = 0; row < NUM_ROWS_ON_BOARD; row++) {
@@ -44,13 +42,6 @@ function createGameBoard() {
         }
 
         markCounter = 0;
-    }
-
-    const printGameBoard = () => { // TODO: Remove this
-        console.log("" + gameBoard[0][0] + gameBoard[0][1] + gameBoard[0][2] + "\n" +
-            gameBoard[1][0] + gameBoard[1][1] + gameBoard[1][2] + "\n" + 
-            gameBoard[2][0] + gameBoard[2][1] + gameBoard[2][2] + "\n"
-        );
     }
 
     const checkForWinner = () => {
@@ -183,7 +174,9 @@ function createGameBoard() {
         return NUM_COLUMNS_ON_BOARD;
     }
 
-    return { addMark, initializeGameBoard, checkForWinner, TIE_INDICATOR, printGameBoard, getMarkAtLocation, getNumGameBoardRows, getNumGameBoardColumns, isGameBoardFull };
+    resetGameBoard();
+
+    return { addMark, resetGameBoard, checkForWinner, getMarkAtLocation, getNumGameBoardRows, getNumGameBoardColumns, isGameBoardFull };
 }
 
 function createGame() {
@@ -194,30 +187,6 @@ function createGame() {
     let currentPlayerIndex = 0;
 
     let gameBoard = createGameBoard();
-    gameBoard.initializeGameBoard();
-
-    // TODO: Remove this if not needed
-    // const runGame = () => {
-
-    //     let winner = "";
-
-    //     while (winner === "") {
-    //         gameBoard.printGameBoard();
-    //         console.log(`It's ${players[currentPlayerIndex].playerName}'s turn`);
-            
-    //         let row = prompt("Please enter a row:");
-    //         let column = prompt("Please enter a column");
-    //         takeTurn(row, column);
-
-    //         winner = gameBoard.checkForWinner();
-    //     }
-
-    //     if (winner === gameBoard.TIE_INDICATOR) {
-    //         console.log("It's a tie!");
-    //     } else {
-    //         console.log(`${winner}s win!`);
-    //     }
-    // }
 
     const takeTurn = (row, column) => {
         if (!isGameOver()) {
@@ -270,7 +239,7 @@ function createGame() {
 
     const startNewGame = () => {
         currentPlayerIndex = 0;
-        gameBoard.initializeGameBoard();
+        gameBoard.resetGameBoard();
     }
 
     return { takeTurn, getNumGameBoardRows, getNumGameBoardColumns, getGameBoardMarkAtLocation, isGameOver, getCurrentPlayer, isCatsGame, getPlayer1, getPlayer2, startNewGame, getWinningPath};
@@ -408,23 +377,5 @@ const gameDisplay = (function () {
 
     return { displayGame };
 })();
-
-// let gameBoard = createGameBoard();
-// gameBoard.initializeGameBoard();
-// gameBoard.addMark(0, 0, "x");
-// gameBoard.addMark(0, 1, "x");
-// gameBoard.addMark(0, 2, "x");
-// gameBoard.addMark(1, 0, "x");
-// gameBoard.addMark(1, 1, "x");
-// gameBoard.addMark(1, 2, "x");
-// gameBoard.addMark(2, 0, "x");
-// gameBoard.addMark(2, 1, "x");
-// gameBoard.addMark(2, 2, "x");
-// gameDisplay.displayGameBoard();
-// gameDisplay.displayGameStatus();
-// gameDisplay.displayPlayerWins();
-
-// let game = createGame();
-// game.runGame();
 
 gameDisplay.displayGame();
