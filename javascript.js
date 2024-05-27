@@ -174,7 +174,8 @@ function createGameBoard() {
 
     resetGameBoard();
 
-    return { addMark, resetGameBoard, checkForWinner, getMarkAtLocation, getNumGameBoardRows, getNumGameBoardColumns, isGameBoardFull };
+    return { addMark, resetGameBoard, checkForWinner, getMarkAtLocation,
+        getNumGameBoardRows, getNumGameBoardColumns, isGameBoardFull };
 }
 
 function createGame(player1Name, player2Name) {
@@ -188,7 +189,8 @@ function createGame(player1Name, player2Name) {
 
     const takeTurn = (row, column) => {
         if (!isGameOver()) {
-            let markPlaced = gameBoard.addMark(row, column, players[currentPlayerIndex].playerIcon);
+            let markPlaced = gameBoard.addMark(row, column,
+                players[currentPlayerIndex].playerIcon);
             if (!isGameOver()) {
                 if (markPlaced) {
                     currentPlayerIndex = ++currentPlayerIndex % players.length;
@@ -240,7 +242,9 @@ function createGame(player1Name, player2Name) {
         gameBoard.resetGameBoard();
     }
 
-    return { takeTurn, getNumGameBoardRows, getNumGameBoardColumns, getGameBoardMarkAtLocation, isGameOver, getCurrentPlayer, isCatsGame, getPlayer1, getPlayer2, startNewGame, getWinningPath};
+    return { takeTurn, getNumGameBoardRows, getNumGameBoardColumns,
+        getGameBoardMarkAtLocation, isGameOver, getCurrentPlayer, isCatsGame,
+        getPlayer1, getPlayer2, startNewGame, getWinningPath};
 }
 
 function createGameDisplay(gameToDisplay) {
@@ -343,14 +347,16 @@ function createGameDisplay(gameToDisplay) {
 
     const highlightWinningPath = (winningPath) => {
         for (let coordinate of winningPath) {
-            let divWinningGameBoardTile = divGameBoardDisplay.querySelector(`[row="${coordinate.row}"][col="${coordinate.col}"] .icon`);
+            let divWinningGameBoardTile = 
+                divGameBoardDisplay.querySelector(`[row="${coordinate.row}"][col="${coordinate.col}"] .icon`);
             divWinningGameBoardTile.classList.add("winning-path");
         }
     }
 
     const handleGameTileClick = (event) => {
         if (!game.isGameOver()) {
-            game.takeTurn(event.target.getAttribute(ROW_ATTRIBUTE_NAME), event.target.getAttribute(COLUMN_ATTRIBUTE_NAME));
+            game.takeTurn(event.target.getAttribute(ROW_ATTRIBUTE_NAME),
+                event.target.getAttribute(COLUMN_ATTRIBUTE_NAME));
             displayGame();
         }
     }
@@ -391,7 +397,8 @@ const newGameDialog = (function () {
     }
 
     const handleNewGameDialogSubmission = () => {
-        createGameDisplay(createGame(txtPlayer1Name.value !== "" ? txtPlayer1Name.value : "Player 1", txtPlayer2Name.value !== "" ? txtPlayer2Name.value : "Player 2")).displayGame();
+        createGameDisplay(createGame(txtPlayer1Name.value !== "" ? txtPlayer1Name.value : "Player 1",
+            txtPlayer2Name.value !== "" ? txtPlayer2Name.value : "Player 2")).displayGame();
         dialog.close();
     }
 
