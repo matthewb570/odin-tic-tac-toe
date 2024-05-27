@@ -1,4 +1,3 @@
-// TODO: Optional: Highlight the winning combination when there's a winner
 // TODO: Allow player name entry
 
 function createPlayer(playerName, playerIcon) {
@@ -55,33 +54,34 @@ function createGameBoard() {
     }
 
     const checkForWinner = () => {
-        let isWinnerPresent = checkForHorizontalWinner();
-        if (isWinnerPresent) {
-            return isWinnerPresent;
+        let winningPath = checkForHorizontalWinner();
+        if (winningPath.length !== 0) {
+            return winningPath;
         }
 
-        isWinnerPresent = checkForVerticalWinner();
-        if (isWinnerPresent) {
-            return isWinnerPresent;
+        winningPath = checkForVerticalWinner();
+        if (winningPath.length !== 0) {
+            return winningPath;
         }
 
         return checkForDiagonalWinner();
     }
 
     const checkForHorizontalWinner = () => {
-        let isWinnerPresent = false;
+        let winningPath = [];
 
         let row = 0;
 
-        while (!isWinnerPresent && row < NUM_ROWS_ON_BOARD) {
+        while (winningPath.length < NUM_COLUMNS_ON_BOARD && row < NUM_ROWS_ON_BOARD) {
             let initialIcon = gameBoard[row][0];
-
+            
             if (initialIcon !== null) {
+                winningPath.push({row, "col": 0});
                 for (let col = 1; col < NUM_COLUMNS_ON_BOARD; col++) {
+                    winningPath.push({row, col});
                     if (gameBoard[row][col] !== initialIcon) {
+                        winningPath = [];
                         break;
-                    } else if (col === NUM_COLUMNS_ON_BOARD - 1) {
-                        isWinnerPresent = true;
                     }
                 }
             }
@@ -89,23 +89,24 @@ function createGameBoard() {
             row++;
         }
 
-        return isWinnerPresent;
+        return winningPath;
     }
 
     const checkForVerticalWinner = () => {
-        let isWinnerPresent = false;
+        let winningPath = [];
 
-        let col = 0 ;
+        let col = 0;
 
-        while (!isWinnerPresent && col < NUM_COLUMNS_ON_BOARD) {
+        while (winningPath.length < NUM_ROWS_ON_BOARD && col < NUM_COLUMNS_ON_BOARD) {
             let initialIcon = gameBoard[0][col];
 
             if (initialIcon !== null) {
+                winningPath.push({"row": 0, col})
                 for (let row = 1; row < NUM_ROWS_ON_BOARD; row++) {
+                    winningPath.push({row, col});
                     if (gameBoard[row][col] !== initialIcon) {
+                        winningPath = [];
                         break;
-                    } else if (row === NUM_ROWS_ON_BOARD - 1) {
-                        isWinnerPresent = true;
                     }
                 }
             }
@@ -113,54 +114,57 @@ function createGameBoard() {
             col++;
         }
 
-        return isWinnerPresent;
+        return winningPath;
     }
 
     const checkForDiagonalWinner = () => {
-        let isWinnerPresent = checkForTopDownDiagonalWinner();
-        if (isWinnerPresent) {
-            return isWinnerPresent;
+        let winningPath = checkForTopDownDiagonalWinner();
+        if (winningPath.length !== 0) {
+            return winningPath;
         }
 
         return checkForBottomUpDiagonalWinner();
     }
 
     const checkForTopDownDiagonalWinner = () => {
-        let isWinnerPresent = false;
+        let winningPath = [];
 
         let initialIcon = gameBoard[0][0];
         if (initialIcon !== null) {
+            winningPath.push({"row": 0, "col": 0})
             for (let row = 1; row < NUM_ROWS_ON_BOARD; row++) {
+                winningPath.push({row, "col": row});
                 if (gameBoard[row][row] !== initialIcon) {
+                    winningPath = [];
                     break;
-                } else if (row === NUM_ROWS_ON_BOARD - 1) {
-                    isWinnerPresent = true;
                 }
             }
         }
 
-        return isWinnerPresent;
+        return winningPath;
     }
 
     const checkForBottomUpDiagonalWinner = () => {
-        let isWinnerPresent = false;
+        let winningPath = [];
 
         let row = NUM_ROWS_ON_BOARD - 1;
         let col = 0;
 
         let initialIcon = gameBoard[row][col];
         if (initialIcon !== null) {
-            do {
-                if (row === 0) {
-                    isWinnerPresent = true;
+            while (row >= 0 && col < NUM_COLUMNS_ON_BOARD) {
+                if (gameBoard[row][col] === initialIcon) {
+                    winningPath.push({row, col});
+                } else {
+                    winningPath = [];
+                    break;
                 }
                 row--;
                 col++;
-            } while (row >= 0 && col < NUM_COLUMNS_ON_BOARD &&
-                gameBoard[row][col] === initialIcon)
+            } 
         }
 
-        return isWinnerPresent;
+        return winningPath;
     }
 
     const isGameBoardFull = () => {
@@ -241,11 +245,15 @@ function createGame() {
     }
 
     const isGameOver = () => {
-        return gameBoard.checkForWinner() || gameBoard.isGameBoardFull();
+        return gameBoard.checkForWinner().length !== 0 || gameBoard.isGameBoardFull();
     }
 
     const isCatsGame = () => {
-        return !gameBoard.checkForWinner() && gameBoard.isGameBoardFull();
+        return gameBoard.checkForWinner().length === 0 && gameBoard.isGameBoardFull();
+    }
+
+    const getWinningPath = () => {
+        return gameBoard.checkForWinner();
     }
 
     const getCurrentPlayer = () => {
@@ -265,7 +273,7 @@ function createGame() {
         gameBoard.initializeGameBoard();
     }
 
-    return { takeTurn, getNumGameBoardRows, getNumGameBoardColumns, getGameBoardMarkAtLocation, isGameOver, getCurrentPlayer, isCatsGame, getPlayer1, getPlayer2, startNewGame};
+    return { takeTurn, getNumGameBoardRows, getNumGameBoardColumns, getGameBoardMarkAtLocation, isGameOver, getCurrentPlayer, isCatsGame, getPlayer1, getPlayer2, startNewGame, getWinningPath};
 }
 
 const gameDisplay = (function () {
@@ -366,6 +374,13 @@ const gameDisplay = (function () {
         div.appendChild(divPlayerScore);
     }
 
+    const highlightWinningPath = (winningPath) => {
+        for (let coordinate of winningPath) {
+            let divWinningGameBoardTile = divGameBoardDisplay.querySelector(`[row="${coordinate.row}"][col="${coordinate.col}"] .icon`);
+            divWinningGameBoardTile.classList.add("winning-path");
+        }
+    }
+
     const handleGameTileClick = (event) => {
         if (!game.isGameOver()) {
             game.takeTurn(event.target.getAttribute(ROW_ATTRIBUTE_NAME), event.target.getAttribute(COLUMN_ATTRIBUTE_NAME));
@@ -382,6 +397,11 @@ const gameDisplay = (function () {
         displayGameStatus();
         displayGameBoard();
         displayPlayerWins(game.getPlayer1(), game.getPlayer2());
+
+        let winningPath = game.getWinningPath();
+        if (winningPath.length !== 0) {
+            highlightWinningPath(winningPath);
+        }
     }
 
     btnNewGame.addEventListener("click", handleNewGameButtonClick);

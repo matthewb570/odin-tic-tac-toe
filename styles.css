@@ -71,6 +71,10 @@ body {
     mask-image: var(--icon-circle);
 }
 
+.icon.winning-path {
+    background-color: red;
+}
+
 .game-tile.top {
     border-bottom-style: solid;
 }
