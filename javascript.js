@@ -179,10 +179,10 @@ function createGameBoard() {
     return { addMark, resetGameBoard, checkForWinner, getMarkAtLocation, getNumGameBoardRows, getNumGameBoardColumns, isGameBoardFull };
 }
 
-function createGame() {
+const game = (function (player1Name, player2Name) {
     let players = [
-        createPlayer("Player 1", "X"),
-        createPlayer("Player 2", "O")
+        createPlayer(player1Name, "X"),
+        createPlayer(player2Name, "O")
     ];
     let currentPlayerIndex = 0;
 
@@ -243,9 +243,9 @@ function createGame() {
     }
 
     return { takeTurn, getNumGameBoardRows, getNumGameBoardColumns, getGameBoardMarkAtLocation, isGameOver, getCurrentPlayer, isCatsGame, getPlayer1, getPlayer2, startNewGame, getWinningPath};
-}
+})("Player 1", "Player 2");
 
-const gameDisplay = (function () {
+const gameDisplay = (function (gameToDisplay) {
 
     const ROW_ATTRIBUTE_NAME = "row";
     const COLUMN_ATTRIBUTE_NAME = "col";
@@ -256,7 +256,7 @@ const gameDisplay = (function () {
     const divGameBoardDisplay = document.querySelector(".game .game-board");
     const btnNewGame = document.querySelector(".game button.new-game");
 
-    const game = createGame();
+    const game = gameToDisplay;
 
     const displayGameStatus = () => {
         if (!game.isGameOver()) {
@@ -376,6 +376,6 @@ const gameDisplay = (function () {
     btnNewGame.addEventListener("click", handleNewGameButtonClick);
 
     return { displayGame };
-})();
+})(game);
 
 gameDisplay.displayGame();
