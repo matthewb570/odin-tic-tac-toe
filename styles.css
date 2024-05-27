@@ -107,6 +107,7 @@ body {
 .game-status-bar .player-wins :first-child {
     border-bottom-style: solid;
     border-color: var(--font-color-dark);
+    text-align: center;
 }
 
 button {
